@@ -49,8 +49,10 @@
   <ItemGroup>
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="Models\Course.cs" />
+    <Compile Include="Models\CourseCycle.cs" />
     <Compile Include="Models\Enrollment.cs" />
     <Compile Include="Models\Student.cs" />
+    <Compile Include="services\CourseCycleService.cs" />
     <Compile Include="services\CourseService.cs" />
     <Compile Include="services\EnrollmentService.cs" />
     <Compile Include="services\PaymentService.cs" />

@@ -11,6 +11,7 @@ namespace College.Models
         private int _id;
         private string _name;
         private string _email;
+        private decimal _balance;
 
         public Student(string name, string email) 
         {
@@ -30,5 +31,6 @@ namespace College.Models
             {get { return _name; } set { _name = value; } }
         public string Email
             { get { return _email; } set { _email = value; } }
+        public decimal Balance { get { return _balance; } set {_balance = value; } }
     }
 }

@@ -22,6 +22,26 @@ namespace College.services
             dbHelper.ExecuteNonQuery(query, parameters);
         }
 
+        public static Student GetStudentById(int StudentId)
+        {
+            DatabaseHelper dbHelper = DatabaseHelper.Instance(); 
+            string query = "SELECT StudentId, StudentName, Email FROM Students WHERE StudentId = @StudentId";
+            SqlParameter parameter = new SqlParameter("@StudentId", SqlDbType.Int) { Value = StudentId };
+
+            using (SqlDataReader reader = dbHelper.ExecuteReader(query, new[] { parameter }))
+            {
+                if (reader.Read())
+                {
+                    int studentId = Convert.ToInt32(reader["StudentId"]);
+                    string studentName = Convert.ToString(reader["StudentName"]);
+                    string studentEmail = Convert.ToString(reader["Email"]);
+
+                    return new Student(studentId, studentName, studentEmail);
+                }
+                // Handle case where no student with the given email exists
+                return null;
+            }
+        }
 
         public static Student GetStudentByEmail(string email)
         {

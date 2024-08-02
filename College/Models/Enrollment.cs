@@ -1,32 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace College.Models
 {
-    public class Enrollment
+    internal class Enrollment
     {
-        public int EnrollmentId { get; set; }
-        public int StudentId { get; set; }
-        public int CycleId { get; set; }
-        public decimal Balance { get; set; }
-        public string CourseName { get; set; } // Assuming you want to display course name in UI
+        // Private fields 
+        private int enrollmentId;
+        private Student student;
+        private CourseCycle courseCycle;
+        private decimal balance;
 
-        public Enrollment(int enrollmentId, int studentId, int cycleId, decimal balance)
+        // Public properties
+        public int EnrollmentId
         {
-            EnrollmentId = enrollmentId;
-            StudentId = studentId;
-            CycleId = cycleId;
-            Balance = balance;
+            get { return enrollmentId; }
+            set { enrollmentId = value; }
         }
 
-        // Optional constructor for convenience if you have the course name
-        public Enrollment(int enrollmentId, int studentId, int cycleId, decimal balance, string courseName)
-            : this(enrollmentId, studentId, cycleId, balance)
+        public Student Student
         {
-            CourseName = courseName;
+            get { return student; }
+            set { student = value; }
+        }
+
+        public CourseCycle CourseCycle
+        {
+            get { return courseCycle; }
+            set { courseCycle = value; }
+        }
+
+        public decimal Balance
+        {
+            get { return balance; }
+            set { balance = value; }
+        }
+
+        // Constructor
+        public Enrollment(int enrollmentId, Student student, CourseCycle courseCycle, decimal balance)
+        {
+            EnrollmentId = enrollmentId;
+            Student = student;
+            CourseCycle = courseCycle;
+            Balance = balance;
         }
     }
 }

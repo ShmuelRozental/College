@@ -100,16 +100,16 @@ namespace College
         public SqlDataReader ExecuteReader(string query, SqlParameter[] parameters = null)
         {
             SqlConnection connection = GetConnection();
-            using (SqlCommand command = new SqlCommand(query, connection))
-            {
-                if (parameters != null)
-                {
-                    command.Parameters.AddRange(parameters);
-                }
+            SqlCommand command = new SqlCommand(query, connection);
 
-                connection.Open();
-                return command.ExecuteReader(CommandBehavior.CloseConnection);
+            // Add parameters if provided
+            if (parameters != null)
+            {
+                command.Parameters.AddRange(parameters);
             }
+
+            connection.Open();
+            return command.ExecuteReader(CommandBehavior.CloseConnection);
         }
 
     }

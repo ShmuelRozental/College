@@ -1,5 +1,5 @@
 ﻿using College.Models;
-using College.services; 
+using College.Services; 
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.SqlClient;
 
 namespace College.View
 {
@@ -30,20 +31,33 @@ namespace College.View
 
         private void LoadStudentCoursesAndBalance()
         {
-            List<Course> enrolledCourses = EnrollmentService.GetEnrolledCoursesByStudentId(student.Id);
-            decimal totalBalance = EnrollmentService.GetTotalBalanceByStudentId(student.Id);
+            decimal totalBalance = 0;
+            DatabaseHelper dbHelper = DatabaseHelper.Instance();
 
-            Console.WriteLine($"Total Balance: {totalBalance}");
+    
+            //get a list of all enrollment for student
+            List<Enrollment> enrolledCourses = EnrollmentService.GetAllStudentEnrollments(student.Id);
+            
 
             // Populate ListBox with enrolled courses
             listBoxCourses.Items.Clear();
-            foreach (Course course in enrolledCourses)
+            foreach (Enrollment enrollment in enrolledCourses)
             {
-                listBoxCourses.Items.Add($"{course.Name} - {course.Price:C}");
+                // method to get course details based on CycleId
+                string courseName = enrollment.CourseCycle.Course.Name;
+                decimal coursePrice = enrollment.CourseCycle.Price;
+                totalBalance += enrollment.Balance;
+
+                ListViewItem item = new ListViewItem(enrollment.EnrollmentId.ToString());
+                item.SubItems.Add(courseName);
+                item.SubItems.Add(coursePrice.ToString());
+                item.SubItems.Add(enrollment.Balance.ToString());
+
+                listViewCourses.Items.Add(item);
             }
 
             // Display total balance
-            lblTotalBalance.Text = $"Total Balance: {totalBalance:C}";
+            lblTotalBalance.Text = $"Total Balance: {totalBalance}";
         }
 
 
@@ -63,8 +77,23 @@ namespace College.View
 
         private void btmPayment_Click(object sender, EventArgs e)
         {
-            PaymentForm paymentForm = new PaymentForm(student);
-            paymentForm.ShowDialog();
+            if (listViewCourses.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = listViewCourses.SelectedItems[0];
+                int enrollmentId = int.Parse(selectedItem.SubItems[0].Text);
+
+                PaymentForm paymentForm = new PaymentForm(student, enrollmentId);
+                paymentForm.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("אנא בחר קורס מרשימת הקורסים לתשלום.");
+            }
+        }
+
+        private void listViewCourses_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

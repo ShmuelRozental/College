@@ -11,9 +11,7 @@ namespace College.Services
         public static List<Course> GetAllCourses()
         {
             DatabaseHelper dbHelper = DatabaseHelper.Instance();
-            string query = "SELECT c.CourseId, c.CourseName, cy.CycleId, cy.StartDate, cy.Price " +
-                           "FROM Courses c " +
-                           "JOIN CourseCycles cy ON c.CourseId = cy.CourseId";
+            string query = "SELECT * FROM Courses ";
 
             DataTable dt = dbHelper.ExecuteQuery(query);
             List<Course> courses = new List<Course>();
@@ -22,10 +20,9 @@ namespace College.Services
             {
                 Course course = new Course
                 {
-                    CourseId = Convert.ToInt32(row["CourseId"]),
+                    Id = Convert.ToInt32(row["CourseId"]),
                     Name = row["CourseName"].ToString(),
-                    CycleId = Convert.ToInt32(row["CycleId"]),
-                    Price = Convert.ToDecimal(row["Price"])
+                    
                 };
                 courses.Add(course);
             }
@@ -33,17 +30,76 @@ namespace College.Services
             return courses;
         }
 
-
-        public static int GetCycleIdForCourse(int courseId)
+        public static CourseCycle GetCycleByCourseId(int courseId)
         {
             DatabaseHelper dbHelper = DatabaseHelper.Instance();
-            string query = "SELECT CycleId FROM CourseCycles WHERE CourseId = @CourseId";
+            string query = "SELECT * FROM CourseCycles WHERE CourseId = @CourseId";
             SqlParameter[] parameters = {
-                new SqlParameter("@CourseId", courseId)
-            };
-            object result = dbHelper.ExecuteScalar(query, parameters);
-            return result != DBNull.Value ? Convert.ToInt32(result) : -1;
+        new SqlParameter("@CourseId", courseId)
+    };
+
+            CourseCycle courseCycle = null;
+
+            try
+            {
+                using (SqlDataReader reader = dbHelper.ExecuteReader(query, parameters))
+                {
+                    if (reader.Read())
+                    {
+                        Course course = GetCourseById(reader.GetInt32(reader.GetOrdinal("CourseId")));
+
+                        courseCycle = new CourseCycle(
+                            reader.GetInt32(reader.GetOrdinal("CycleId")),
+                            course,
+                            reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            reader.GetString(reader.GetOrdinal("DaysOfWeek")),
+                            reader.GetTimeSpan(reader.GetOrdinal("StartTime")),
+                            reader.GetTimeSpan(reader.GetOrdinal("EndTime")),
+                            reader.GetDecimal(reader.GetOrdinal("Price"))
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+
+            return courseCycle;
         }
 
+        public static Course GetCourseById(int courseId)
+        {
+            DatabaseHelper dbHelper = DatabaseHelper.Instance();
+            string query = "SELECT * FROM Courses WHERE CourseId = @CourseId";
+            SqlParameter[] parameters = {
+            new SqlParameter("@CourseId", courseId)
+            };
+
+            Course course = null;
+
+            try
+            {
+                using (SqlDataReader reader = dbHelper.ExecuteReader(query, parameters))
+                {
+                    if (reader.Read())
+                    {
+                        course = new Course
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("CourseId")),
+                            Name = reader.GetString(reader.GetOrdinal("CourseName"))
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+
+            return course;
+        }
     }
+
 }
